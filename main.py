@@ -24,7 +24,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-TARGET_BACKEND_URL = os.environ.get("TARGET_BACKEND_URL", "http://localhost:8001")
+TARGET_BACKEND_URL = os.environ.get("TARGET_BACKEND_URL", "https://pokeapi.co/api/v2")
 ESCROW_CONTRACT_ADDRESS = os.environ.get("ESCROW_CONTRACT_ADDRESS", "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9")
 PRICE_USDC = float(os.environ.get("PRICE_USDC", "1.00"))
 
