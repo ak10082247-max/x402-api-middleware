@@ -55,7 +55,11 @@ def create_402_response():
         "asset": "USDC",
         "price": f"{PRICE_USDC:.2f}",
         "escrow_address": ESCROW_CONTRACT_ADDRESS,
-        "instructions": "Deposit USDC into the escrow contract and provide an off-chain signed voucher in the PAYMENT-SIGNATURE header."
+        "instructions": "Deposit USDC into the escrow contract and provide an off-chain signed voucher in the PAYMENT-SIGNATURE header.",
+        "bazaar": {
+            "name": "Crypto Price API",
+            "description": "Live Bitcoin pricing endpoint powered by Coindesk."
+        }
     }]
     req_b64 = base64.b64encode(json.dumps(requirements).encode()).decode()
     return JSONResponse(

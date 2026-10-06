@@ -12,6 +12,12 @@ DATABASE_URL = os.environ.get("DATABASE_URL")
 w3 = Web3(Web3.HTTPProvider(RPC_URL))
 
 def get_db_connection():
+    """
+    Returns a PostgreSQL connection. 
+    IMPORTANT: For free cloud hosts like Render, ensure DATABASE_URL uses the Supabase 
+    Transaction Pooler connection string (IPv4). This typically uses port 6543 (transaction mode) 
+    or port 5432 (session mode) on a pooler.supabase.com host.
+    """
     if not DATABASE_URL:
         raise ValueError("DATABASE_URL environment variable not set")
     return psycopg2.connect(DATABASE_URL)
@@ -56,9 +62,11 @@ def save_voucher(agent_address: str, amount_usdc: float, nonce: int, signature: 
     c.close()
     conn.close()
 
+from eth_account.messages import encode_typed_data
+
 def verify_voucher(voucher_data: dict, expected_amount_usdc: float) -> bool:
     """
-    Verifies an off-chain cryptographic voucher.
+    Verifies an off-chain cryptographic voucher using EIP-712.
     """
     try:
         agent_address = voucher_data.get("agentAddress")
@@ -76,9 +84,30 @@ def verify_voucher(voucher_data: dict, expected_amount_usdc: float) -> bool:
             print(f"Nonce {nonce} already used for agent {agent_address}")
             return False
 
-        message = f"x402_voucher:{ESCROW_CONTRACT_ADDRESS}:{amount}:{nonce}"
-        signable_message = encode_defunct(text=message)
+        domain_data = {
+            "name": "x402",
+            "version": "2",
+            "chainId": w3.eth.chain_id,
+            "verifyingContract": ESCROW_CONTRACT_ADDRESS,
+        }
         
+        message_types = {
+            "Voucher": [
+                {"name": "agentAddress", "type": "address"},
+                {"name": "amountUsdc", "type": "uint256"},
+                {"name": "nonce", "type": "uint256"}
+            ]
+        }
+        
+        amount_wei = int(amount * 10**6)
+        
+        message_data = {
+            "agentAddress": agent_address,
+            "amountUsdc": amount_wei,
+            "nonce": nonce
+        }
+        
+        signable_message = encode_typed_data(domain_data, message_types, message_data)
         recovered_address = w3.eth.account.recover_message(signable_message, signature=signature)
         
         if recovered_address.lower() == agent_address.lower():
