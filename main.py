@@ -25,7 +25,7 @@ app.add_middleware(
 )
 
 TARGET_BACKEND_URL = os.environ.get("TARGET_BACKEND_URL", "http://localhost:8001")
-ESCROW_CONTRACT_ADDRESS = os.environ.get("ESCROW_CONTRACT_ADDRESS")
+ESCROW_CONTRACT_ADDRESS = os.environ.get("ESCROW_CONTRACT_ADDRESS", "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9")
 PRICE_USDC = float(os.environ.get("PRICE_USDC", "1.00"))
 
 scheduler = AsyncIOScheduler()

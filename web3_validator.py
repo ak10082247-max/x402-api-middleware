@@ -6,7 +6,7 @@ from web3 import Web3
 from eth_account.messages import encode_defunct
 
 RPC_URL = os.environ.get("BASE_RPC_URL", "https://mainnet.base.org")
-ESCROW_CONTRACT_ADDRESS = os.environ.get("ESCROW_CONTRACT_ADDRESS")
+ESCROW_CONTRACT_ADDRESS = os.environ.get("ESCROW_CONTRACT_ADDRESS", "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9")
 DATABASE_URL = os.environ.get("DATABASE_URL")
 
 w3 = Web3(Web3.HTTPProvider(RPC_URL))
