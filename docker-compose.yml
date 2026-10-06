@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  x402-proxy:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - BASE_RPC_URL=https://mainnet.base.org
+      - USDC_CONTRACT_ADDRESS=0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913
+      - PRICE_USDC=1.00
+      - TARGET_BACKEND_URL=http://mock-backend:8001
+      # IMPORTANT: Replace these in your production .env file!
+      - PROXY_WALLET_ADDRESS=YOUR_PROXY_CUSTODY_WALLET_ADDRESS
+      - PROXY_PRIVATE_KEY=YOUR_PROXY_CUSTODY_PRIVATE_KEY
+      - PROVIDER_WALLET_ADDRESS=YOUR_API_PROVIDER_WALLET_ADDRESS
+      - PLATFORM_WALLET_ADDRESS=YOUR_PLATFORM_FEE_WALLET_ADDRESS
+    depends_on:
+      - mock-backend
+
+  mock-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: uvicorn mock_backend:app --host 0.0.0.0 --port 8001
+    ports:
+      - "8001:8001"

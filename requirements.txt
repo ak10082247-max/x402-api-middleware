@@ -1,0 +1,6 @@
+fastapi==0.109.2
+uvicorn==0.27.1
+web3==6.15.1
+httpx==0.26.0
+psycopg2-binary==2.9.9
+apscheduler==3.10.4

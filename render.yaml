@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: x402-api-middleware
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port 10000
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: TARGET_BACKEND_URL
+        sync: false
+      - key: ESCROW_CONTRACT_ADDRESS
+        sync: false
+      - key: PROXY_PRIVATE_KEY
+        sync: false
+      - key: PROVIDER_WALLET_ADDRESS
+        sync: false
+      - key: PLATFORM_WALLET_ADDRESS
+        sync: false
+      - key: PRICE_USDC
+        value: "1.00"
