@@ -7,13 +7,14 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse, Response
 from fastapi.middleware.cors import CORSMiddleware
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+import trafilatura
 
 from web3_validator import init_db, verify_voucher
 from fee_splitter import run_nightly_batch
 
 app = FastAPI(
-    title="x402 API Middleware",
-    description="Web3 reverse-proxy middleware that monetizes AI agents via HTTP 402 and off-chain batch settlement.",
+    title="x402 Markdown Scraper API",
+    description="Zero-cost LLM-ready markdown scraper protected by x402.",
     version="2.1.0"
 )
 
@@ -24,9 +25,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-TARGET_BACKEND_URL = os.environ.get("TARGET_BACKEND_URL", "https://pokeapi.co/api/v2")
 ESCROW_CONTRACT_ADDRESS = os.environ.get("ESCROW_CONTRACT_ADDRESS", "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9")
-PRICE_USDC = float(os.environ.get("PRICE_USDC", "1.00"))
+PRICE_USDC = float(os.environ.get("PRICE_USDC", "0.05"))
 
 scheduler = AsyncIOScheduler()
 
@@ -57,8 +57,8 @@ def create_402_response():
         "payTo": ESCROW_CONTRACT_ADDRESS,
         "instructions": "Pay using CDP Facilitator",
         "bazaar": {
-            "name": "Crypto Price API",
-            "description": "Live Bitcoin pricing endpoint powered by Coindesk."
+            "name": "LLM Markdown Scraper",
+            "description": "Native Python web scraper. Pass any URL and receive clean, token-efficient Markdown optimized for AI agents and RAG pipelines."
         }
     }]
     req_b64 = base64.b64encode(json.dumps(requirements).encode()).decode()
@@ -68,14 +68,13 @@ def create_402_response():
         headers={"PAYMENT-REQUIRED": req_b64}
     )
 
-@app.api_route("/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"])
-async def proxy_middleware(request: Request, path: str):
+@app.api_route("/scrape", methods=["GET", "POST"])
+async def scrape_middleware(request: Request, url: str = None):
     if request.method == "OPTIONS":
         return Response(status_code=200)
 
-    # Bypass payment check for health route if it accidentally fell through to proxy
-    if path == "health":
-        return await health_check()
+    if not url:
+        return JSONResponse({"error": "Missing 'url' query parameter"}, status_code=400)
 
     payment_signature = request.headers.get("PAYMENT-SIGNATURE")
     
@@ -93,35 +92,22 @@ async def proxy_middleware(request: Request, path: str):
     if not is_valid:
         return JSONResponse({"error": "Voucher cryptographic verification failed or nonce reused."}, status_code=402)
     
-    # Forward the Request
-    target_url = f"{TARGET_BACKEND_URL}/{path}"
-    
-    if request.url.query:
-        target_url += f"?{request.url.query}"
-
-    async with httpx.AsyncClient() as client:
-        req_body = await request.body()
+    # Execute native Python web-scraper
+    try:
+        downloaded = trafilatura.fetch_url(url)
+        if downloaded is None:
+            return JSONResponse({"error": "Failed to fetch URL"}, status_code=400)
+        markdown_content = trafilatura.extract(downloaded, output_format='markdown')
+        if markdown_content is None:
+            return JSONResponse({"error": "Failed to extract content"}, status_code=400)
         
-        headers = dict(request.headers)
-        headers.pop("host", None)
-        headers.pop("payment-signature", None)
-        
-        try:
-            resp = await client.request(
-                method=request.method,
-                url=target_url,
-                headers=headers,
-                content=req_body,
-                timeout=30.0
-            )
-            
-            return Response(
-                content=resp.content,
-                status_code=resp.status_code,
-                headers=dict(resp.headers)
-            )
-        except httpx.RequestError as exc:
-            return JSONResponse({"error": f"Failed to reach target backend: {exc}"}, status_code=502)
+        return Response(
+            content=markdown_content,
+            media_type="text/markdown",
+            status_code=200
+        )
+    except Exception as exc:
+        return JSONResponse({"error": f"Scraping failed: {exc}"}, status_code=500)
 
 if __name__ == "__main__":
     import uvicorn
