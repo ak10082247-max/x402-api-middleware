@@ -50,12 +50,12 @@ async def health_check():
 
 def create_402_response():
     requirements = [{
-        "scheme": "batch-settlement",
-        "network": "base",
+        "scheme": "eip155:exact",
+        "network": "eip155:84532",
         "asset": "USDC",
         "price": f"{PRICE_USDC:.2f}",
-        "escrow_address": ESCROW_CONTRACT_ADDRESS,
-        "instructions": "Deposit USDC into the escrow contract and provide an off-chain signed voucher in the PAYMENT-SIGNATURE header.",
+        "payTo": ESCROW_CONTRACT_ADDRESS,
+        "instructions": "Pay using CDP Facilitator",
         "bazaar": {
             "name": "Crypto Price API",
             "description": "Live Bitcoin pricing endpoint powered by Coindesk."
