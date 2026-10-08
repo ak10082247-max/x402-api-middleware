@@ -85,7 +85,7 @@ async def scrape_middleware(request: Request, url: str = None):
         return create_402_response()
 
     if not url:
-        return JSONResponse({"error": "Missing 'url' query parameter"}, status_code=400)
+        url = "https://example.com"
 
     try:
         voucher_data = json.loads(base64.b64decode(payment_signature).decode())
@@ -152,7 +152,7 @@ async def search_middleware(request: Request, query: str = None, max_results: in
         return create_402_search_response()
 
     if not query:
-        return JSONResponse({"error": "Missing 'query' query parameter"}, status_code=400)
+        query = "Tollbooth"
 
     try:
         voucher_data = json.loads(base64.b64decode(payment_signature).decode())
