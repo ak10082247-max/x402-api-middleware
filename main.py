@@ -57,6 +57,10 @@ def create_402_response():
         "price": f"{PRICE_USDC:.2f}",
         "payTo": ESCROW_CONTRACT_ADDRESS,
         "instructions": "Pay using CDP Facilitator",
+        "extra": {
+            "name": "USD Coin",
+            "version": "2"
+        },
         "bazaar": {
             "name": "LLM Markdown Scraper",
             "description": "Native Python web scraper. Pass any URL and receive clean, token-efficient Markdown optimized for AI agents and RAG pipelines."
@@ -119,6 +123,10 @@ def create_402_search_response():
         "price": f"{PRICE_USDC:.2f}",
         "payTo": ESCROW_CONTRACT_ADDRESS,
         "instructions": "Pay using CDP Facilitator",
+        "extra": {
+            "name": "USD Coin",
+            "version": "2"
+        },
         "bazaar": {
             "name": "Live Web Search API",
             "description": "High-quality, unrestricted live search results from DuckDuckGo. Pass a query and receive structured JSON tailored for agentic reasoning and data extraction."
