@@ -49,10 +49,11 @@ async def health_check():
     }
 
 def create_402_response():
-    requirements = [{
+    accepts = [{
         "scheme": "eip155:exact",
         "network": "eip155:84532",
-        "asset": "USDC",
+        "asset": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+        "amount": str(int(PRICE_USDC * 1e6)),
         "price": f"{PRICE_USDC:.2f}",
         "payTo": ESCROW_CONTRACT_ADDRESS,
         "instructions": "Pay using CDP Facilitator",
@@ -61,7 +62,7 @@ def create_402_response():
             "description": "Native Python web scraper. Pass any URL and receive clean, token-efficient Markdown optimized for AI agents and RAG pipelines."
         }
     }]
-    req_b64 = base64.b64encode(json.dumps(requirements).encode()).decode()
+    req_b64 = base64.b64encode(json.dumps({"accepts": accepts}).encode()).decode()
     return JSONResponse(
         {"error": "Payment Required", "message": "Batch-settlement voucher required."}, 
         status_code=402, 
@@ -110,10 +111,11 @@ async def scrape_middleware(request: Request, url: str = None):
         return JSONResponse({"error": f"Scraping failed: {exc}"}, status_code=500)
 
 def create_402_search_response():
-    requirements = [{
+    accepts = [{
         "scheme": "eip155:exact",
         "network": "eip155:84532",
-        "asset": "USDC",
+        "asset": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+        "amount": str(int(PRICE_USDC * 1e6)),
         "price": f"{PRICE_USDC:.2f}",
         "payTo": ESCROW_CONTRACT_ADDRESS,
         "instructions": "Pay using CDP Facilitator",
@@ -122,7 +124,7 @@ def create_402_search_response():
             "description": "High-quality, unrestricted live search results from DuckDuckGo. Pass a query and receive structured JSON tailored for agentic reasoning and data extraction."
         }
     }]
-    req_b64 = base64.b64encode(json.dumps(requirements).encode()).decode()
+    req_b64 = base64.b64encode(json.dumps({"accepts": accepts}).encode()).decode()
     return JSONResponse(
         {"error": "Payment Required", "message": "Batch-settlement voucher required."}, 
         status_code=402, 
