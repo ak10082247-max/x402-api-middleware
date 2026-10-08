@@ -109,6 +109,62 @@ async def scrape_middleware(request: Request, url: str = None):
     except Exception as exc:
         return JSONResponse({"error": f"Scraping failed: {exc}"}, status_code=500)
 
+def create_402_search_response():
+    requirements = [{
+        "scheme": "eip155:exact",
+        "network": "eip155:84532",
+        "asset": "USDC",
+        "price": f"{PRICE_USDC:.2f}",
+        "payTo": ESCROW_CONTRACT_ADDRESS,
+        "instructions": "Pay using CDP Facilitator",
+        "bazaar": {
+            "name": "Live Web Search API",
+            "description": "High-quality, unrestricted live search results from DuckDuckGo. Pass a query and receive structured JSON tailored for agentic reasoning and data extraction."
+        }
+    }]
+    req_b64 = base64.b64encode(json.dumps(requirements).encode()).decode()
+    return JSONResponse(
+        {"error": "Payment Required", "message": "Batch-settlement voucher required."}, 
+        status_code=402, 
+        headers={"PAYMENT-REQUIRED": req_b64}
+    )
+
+@app.api_route("/search", methods=["GET", "POST"])
+async def search_middleware(request: Request, query: str = None, max_results: int = 5):
+    if request.method == "OPTIONS":
+        return Response(status_code=200)
+
+    if not query:
+        return JSONResponse({"error": "Missing 'query' query parameter"}, status_code=400)
+
+    payment_signature = request.headers.get("PAYMENT-SIGNATURE")
+    
+    if not payment_signature:
+        return create_402_search_response()
+
+    try:
+        voucher_data = json.loads(base64.b64decode(payment_signature).decode())
+    except Exception:
+        return JSONResponse({"error": "Invalid voucher format"}, status_code=400)
+
+    # Verify off-chain cryptographic voucher
+    is_valid = verify_voucher(voucher_data, PRICE_USDC)
+    
+    if not is_valid:
+        return JSONResponse({"error": "Voucher cryptographic verification failed or nonce reused."}, status_code=402)
+    
+    # Execute native Python web search
+    try:
+        from duckduckgo_search import DDGS
+        results = []
+        with DDGS() as ddgs:
+            for r in ddgs.text(query, max_results=max_results):
+                results.append(r)
+        
+        return JSONResponse({"query": query, "results": results}, status_code=200)
+    except Exception as exc:
+        return JSONResponse({"error": f"Search failed: {exc}"}, status_code=500)
+
 if __name__ == "__main__":
     import uvicorn
     port = int(os.environ.get("PORT", 10000))
