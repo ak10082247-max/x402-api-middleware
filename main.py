@@ -73,13 +73,13 @@ async def scrape_middleware(request: Request, url: str = None):
     if request.method == "OPTIONS":
         return Response(status_code=200)
 
-    if not url:
-        return JSONResponse({"error": "Missing 'url' query parameter"}, status_code=400)
-
     payment_signature = request.headers.get("PAYMENT-SIGNATURE")
     
     if not payment_signature:
         return create_402_response()
+
+    if not url:
+        return JSONResponse({"error": "Missing 'url' query parameter"}, status_code=400)
 
     try:
         voucher_data = json.loads(base64.b64decode(payment_signature).decode())
@@ -134,13 +134,13 @@ async def search_middleware(request: Request, query: str = None, max_results: in
     if request.method == "OPTIONS":
         return Response(status_code=200)
 
-    if not query:
-        return JSONResponse({"error": "Missing 'query' query parameter"}, status_code=400)
-
     payment_signature = request.headers.get("PAYMENT-SIGNATURE")
     
     if not payment_signature:
         return create_402_search_response()
+
+    if not query:
+        return JSONResponse({"error": "Missing 'query' query parameter"}, status_code=400)
 
     try:
         voucher_data = json.loads(base64.b64decode(payment_signature).decode())
