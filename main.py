@@ -62,7 +62,7 @@ def create_402_response():
             "description": "Native Python web scraper. Pass any URL and receive clean, token-efficient Markdown optimized for AI agents and RAG pipelines."
         }
     }]
-    req_b64 = base64.b64encode(json.dumps({"accepts": accepts}).encode()).decode()
+    req_b64 = base64.b64encode(json.dumps({"x402Version": 2, "accepts": accepts}).encode()).decode()
     return JSONResponse(
         {"error": "Payment Required", "message": "Batch-settlement voucher required."}, 
         status_code=402, 
@@ -124,7 +124,7 @@ def create_402_search_response():
             "description": "High-quality, unrestricted live search results from DuckDuckGo. Pass a query and receive structured JSON tailored for agentic reasoning and data extraction."
         }
     }]
-    req_b64 = base64.b64encode(json.dumps({"accepts": accepts}).encode()).decode()
+    req_b64 = base64.b64encode(json.dumps({"x402Version": 2, "accepts": accepts}).encode()).decode()
     return JSONResponse(
         {"error": "Payment Required", "message": "Batch-settlement voucher required."}, 
         status_code=402, 
