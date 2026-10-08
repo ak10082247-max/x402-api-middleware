@@ -25,7 +25,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-ESCROW_CONTRACT_ADDRESS = os.environ.get("ESCROW_CONTRACT_ADDRESS", "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9")
+ESCROW_CONTRACT_ADDRESS = os.environ.get("ESCROW_CONTRACT_ADDRESS", "0x73279fa4BadA7CAC888c62CDa4f5c8104765f6f1")
 PRICE_USDC = float(os.environ.get("PRICE_USDC", "0.05"))
 
 scheduler = AsyncIOScheduler()
