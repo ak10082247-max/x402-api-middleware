@@ -55,6 +55,7 @@ def create_402_response():
         "asset": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
         "amount": str(int(PRICE_USDC * 1e6)),
         "price": f"{PRICE_USDC:.2f}",
+        "maxTimeoutSeconds": 3600,
         "payTo": ESCROW_CONTRACT_ADDRESS,
         "instructions": "Pay using CDP Facilitator",
         "extra": {
@@ -121,6 +122,7 @@ def create_402_search_response():
         "asset": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
         "amount": str(int(PRICE_USDC * 1e6)),
         "price": f"{PRICE_USDC:.2f}",
+        "maxTimeoutSeconds": 3600,
         "payTo": ESCROW_CONTRACT_ADDRESS,
         "instructions": "Pay using CDP Facilitator",
         "extra": {
