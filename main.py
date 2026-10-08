@@ -50,7 +50,7 @@ async def health_check():
 
 def create_402_response():
     accepts = [{
-        "scheme": "eip155:exact",
+        "scheme": "exact",
         "network": "eip155:84532",
         "asset": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
         "amount": str(int(PRICE_USDC * 1e6)),
@@ -112,7 +112,7 @@ async def scrape_middleware(request: Request, url: str = None):
 
 def create_402_search_response():
     accepts = [{
-        "scheme": "eip155:exact",
+        "scheme": "exact",
         "network": "eip155:84532",
         "asset": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
         "amount": str(int(PRICE_USDC * 1e6)),
